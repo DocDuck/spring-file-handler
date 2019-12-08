@@ -44,9 +44,8 @@ public class FileController {
     // на этом урле принимаем несколько файлов с клиента
     @PostMapping("/uploadFiles")
     public List<UploadFileResponse> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-        return Arrays.asList(files)
-                .stream()
-                .map(file -> uploadFile(file))
+        return Arrays.stream(files)
+                .map(this::uploadFile)
                 .collect(Collectors.toList());
     }
 

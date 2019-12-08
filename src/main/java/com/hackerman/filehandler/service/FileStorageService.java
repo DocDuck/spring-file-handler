@@ -9,12 +9,15 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 /**
  * Этот сервис реализует логику сохранения файлов на сервер и выдачу их клиенту
@@ -39,7 +42,7 @@ public class FileStorageService {
     // Метод который сохраняет файл
     public String storeFile(MultipartFile file) {
         // Приводим в порядок имя файла
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         try {
             // Проверяем на непотребство в пути сохранения файла
@@ -57,12 +60,27 @@ public class FileStorageService {
         }
     }
 
+    // Метод, который удаляет файл
+    public void deleteFile(String fileName) throws IOException {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                Files.delete(filePath);
+            } else {
+                throw new FileStorageException("Не выпилить файл " + fileName + ". Попробуй еще разок)");
+            }
+        } catch (IOException ex) {
+            throw new FileStorageException("Не выпилить файл " + fileName + ". Попробуй еще разок)", ex);
+        }
+    }
+
     // Метод который упаковывает файл как ресурс и отдает клиенту
     public Resource loadFileAsResource(String fileName) {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
-            if(resource.exists()) {
+            if (resource.exists()) {
                 return resource;
             } else {
                 throw new MyFileNotFoundException("Такого файла нет(( " + fileName);

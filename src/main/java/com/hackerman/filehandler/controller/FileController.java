@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -63,15 +64,21 @@ public class FileController {
             logger.info("Не могу определить тип файла");
         }
 
-        // Если тип файла не определен, то ставим октет-стим по дефолту
+        // Если тип файла не определен, то ставим октет-стрим по дефолту
         if(contentType == null) {
             contentType = "application/octet-stream";
         }
 
-        // если все гуд - юзер получает файл
+        // если все гуд - юзер получает ответ 200 и файл
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    // отсюда удаляем файл по имени
+    @GetMapping("/deleteFile/{fileName:.+}")
+    public void deleteFile(@PathVariable String fileName, HttpServletRequest request) throws IOException {
+        fileStorageService.deleteFile(fileName);
     }
 }

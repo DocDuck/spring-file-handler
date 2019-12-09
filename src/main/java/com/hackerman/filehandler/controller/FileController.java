@@ -78,7 +78,7 @@ public class FileController {
 
     // отсюда удаляем файл по имени
     @GetMapping("/deleteFile/{fileName:.+}")
-    public void deleteFile(@PathVariable String fileName, HttpServletRequest request) throws IOException {
+    public void deleteFile(@PathVariable String fileName, HttpServletRequest request) {
         fileStorageService.deleteFile(fileName);
     }
 }

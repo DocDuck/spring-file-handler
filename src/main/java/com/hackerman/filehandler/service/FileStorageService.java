@@ -61,12 +61,13 @@ public class FileStorageService {
     }
 
     // Метод, который удаляет файл
-    public void deleteFile(String fileName) throws IOException {
+    public void deleteFile(String fileName) {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            File file = new File(String.valueOf(filePath));
             Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists()) {
-                Files.delete(filePath);
+            if (file.delete()) {
+                System.out.println(file.getName() + " удалён!");
             } else {
                 throw new FileStorageException("Не выпилить файл " + fileName + ". Попробуй еще разок)");
             }
